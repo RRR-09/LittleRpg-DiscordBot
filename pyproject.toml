@@ -22,6 +22,9 @@ flake8 = "^4.0.1"
 isort = "^5.10.1"
 mypy = "^0.920"
 ossaudit = "^0.5.0"
+types-PyYAML = "^6.0.1"
+types-pytz = "^2021.3.3"
+types-requests = "^2.26.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
