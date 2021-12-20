@@ -1,9 +1,9 @@
 from datetime import datetime
+from io import FileIO
 from json import load as load_json
 from math import floor
 from typing import Any, Dict, List, Tuple, Union
 
-from _typeshed import SupportsRead
 from discord import Guild as DiscordGuild
 from discord import Member as DiscordMember
 from discord import Message as DiscordMessage
@@ -83,9 +83,9 @@ def json_eval_object_pairs_hook(ordered_pairs: List[Tuple[Any, Any]]) -> Dict:
     return result
 
 
-def json_load_eval(fp_obj: SupportsRead[Union[str, bytes]]) -> Dict:
+def json_load_eval(fp_obj: FileIO) -> Dict:
     """
-    Loads a JSON file, evaluating any strings to possible variables
+    Loads a JSON file, evaluating any strings to possible variables.
     """
     return load_json(fp_obj, object_pairs_hook=json_eval_object_pairs_hook)
 
