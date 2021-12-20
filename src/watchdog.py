@@ -9,7 +9,7 @@ from typing import Dict
 def launch(config: Dict):
     bash_cmd = f'cd "{config["directory"]}";{config["launch_command"]}'
     screen_cmd = f'screen -A -m -d -S {config["process_name"]} bash -c "{bash_cmd}"'
-    Popen(screen_cmd)
+    Popen(screen_cmd, shell=True)  # nosec
 
 
 def check(config: Dict) -> bool:
