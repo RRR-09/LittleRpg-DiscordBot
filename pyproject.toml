@@ -29,3 +29,15 @@ types-requests = "^2.26.2"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+# Customizations
+[tool.isort]
+src_paths=["src"]
+profile = "black"
+
+[tool.mypy]
+python_version = "3.9"
+
+[[tool.mypy.overrides]]
+module = ["discord.*"]
+ignore_missing_imports = true
