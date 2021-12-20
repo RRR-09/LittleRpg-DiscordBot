@@ -1,15 +1,33 @@
+import logging
+from argparse import ArgumentParser
 from datetime import datetime
-from io import FileIO
 from json import load as load_json
 from math import floor
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, TextIO, Tuple, Union
 
+from discord import Client as DiscordClient
 from discord import Guild as DiscordGuild
+from discord import Intents as DiscordIntents
 from discord import Member as DiscordMember
 from discord import Message as DiscordMessage
 from discord import User as DiscordUser
 from discord import Webhook as DiscordWebhook
 from pytz import timezone
+
+
+class BotClass:
+    def __init__(self, intents: DiscordIntents):
+        self.client = DiscordClient(intents=intents)
+        self.logger = logging.getLogger("discord")
+        self.logger.setLevel(logging.ERROR)
+        self.handler = logging.FileHandler(
+            filename="discord.log", encoding="utf-8", mode="w"
+        )
+        self.handler.setFormatter(
+            logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s")
+        )
+        self.logger.addHandler(self.handler)
+        do_log("Initialized Discord Client")
 
 
 def censor_text(text: str, leave_uncensored: int = 4) -> str:
@@ -83,7 +101,7 @@ def json_eval_object_pairs_hook(ordered_pairs: List[Tuple[Any, Any]]) -> Dict:
     return result
 
 
-def json_load_eval(fp_obj: FileIO) -> Dict:
+def json_load_eval(fp_obj: TextIO) -> Dict:
     """
     Loads a JSON file, evaluating any strings to possible variables.
     """
@@ -237,3 +255,23 @@ async def get_english_timestamp(time_var: Union[int, float]) -> str:
     return "{} day{}, {} hour{}".format(
         days, "s" if days != 1 else "", hours_rounded, "s" if hours_rounded != 1 else ""
     )
+
+
+def load_config_to_bot(bot_instance: BotClass) -> BotClass:
+    parser = ArgumentParser(description="Discord bot arguments.")
+    parser.add_argument(
+        "--config", help="Filepath for the config JSON file", default="config.json"
+    )
+    args = parser.parse_args()
+    try:
+        with open(args.config, "r", encoding="utf-8") as config_file:
+            loaded_config = json_load_eval(config_file)
+    except FileNotFoundError:
+        raise FileNotFoundError(f"'{args.config}' not found.")
+    for config_key in loaded_config:
+        loaded_val = loaded_config[config_key]
+        setattr(bot_instance, config_key, loaded_val)
+        do_log(
+            f"Loaded config setting \n'{config_key}' ({type(loaded_val).__name__})\n{loaded_val} "
+        )
+    return bot_instance

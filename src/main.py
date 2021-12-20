@@ -1,5 +1,3 @@
-import argparse
-import logging
 import os
 from traceback import format_exc
 
@@ -7,24 +5,10 @@ import discord
 from dotenv import load_dotenv
 
 import utils
-
-
-class BotClass:
-    def __init__(self, intents: discord.Intents):
-        self.client = discord.Client(intents=intents)
-        self.logger = logging.getLogger("discord")
-        self.logger.setLevel(logging.ERROR)
-        self.handler = logging.FileHandler(
-            filename="discord.log", encoding="utf-8", mode="w"
-        )
-        self.handler.setFormatter(
-            logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s")
-        )
-        self.logger.addHandler(self.handler)
-        utils.do_log("Initialized Discord Client")
-
+from utils import BotClass
 
 client_intents = discord.Intents(messages=True, guilds=True, members=True)
+global bot
 bot = BotClass(client_intents)
 
 
@@ -58,19 +42,27 @@ async def on_message(message):
     ).replace("@here", "@ here")
 
 
+async def player_count():
+    # TODO: player count
+    bot.server_status = "0/0 players"
+    await bot.client.change_presence(
+        activity=discord.Game(name=bot.server_status, type=0)
+    )
+
+
 async def config():
     bot.guild = bot.client.get_guild(bot.discord_guild_id)
 
     # Instantiate channel objects
-    bot.channels = []
+    bot.channels = {}
     for channel_name in bot.channel_ids:
-        channel_id = bot.channels[channel_name]
+        channel_id = bot.channel_ids[channel_name]
         bot.channels[channel_name] = bot.guild.get_channel(channel_id)
 
     # Instantiate role objects
-    bot.roles = []
+    bot.roles = {}
     for role_name in bot.role_ids:
-        role_id = bot.roles[role_name]
+        role_id = bot.role_ids[role_name]
         bot.roles[role_name] = bot.guild.get_role(role_id)
 
     bot.server_status = "Querying server..."
@@ -99,32 +91,15 @@ async def on_ready():
         await bot.client.close()
         await bot.client.logout()
         raise Exception("CRITICAL ERROR: FAILURE TO INITIALIZE")
-
-
-def load_config_to_bot():
-    parser = argparse.ArgumentParser(description="Discord bot arguments.")
-    parser.add_argument(
-        "--config", help="Filepath for the config JSON file", default="config.json"
-    )
-    args = parser.parse_args()
-    try:
-        with open(args.config, "r", encoding="utf-8") as config_file:
-            loaded_config = utils.json_load_eval(config_file)
-    except FileNotFoundError:
-        raise FileNotFoundError(f"'{args.config}' not found.")
-    for config_key in loaded_config:
-        loaded_val = loaded_config[config_key]
-        setattr(bot, config_key, loaded_val)
-        utils.do_log(
-            f"Loaded config setting \n'{config_key}' ({type(loaded_val).__name__})\n{loaded_val} "
-        )
+    await player_count()
 
 
 def main():
+    global bot
     bot.ready = False
     utils.do_log("Loading Config")
 
-    load_config_to_bot()  # Load a json to the bot class
+    bot = utils.load_config_to_bot(bot)  # Load a json to the bot class
     load_dotenv(verbose=True)
 
     # Merge any env vars with config vars, and make variables easily accessible
