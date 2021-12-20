@@ -5,19 +5,26 @@ from json import load as load_json
 from math import floor
 from typing import Any, Dict, List, TextIO, Tuple, Union
 
-from discord import Client as DiscordClient
 from discord import Guild as DiscordGuild
 from discord import Intents as DiscordIntents
 from discord import Member as DiscordMember
 from discord import Message as DiscordMessage
+from discord import Role as DiscordRole
+from discord import TextChannel as DiscordChannel
 from discord import User as DiscordUser
 from discord import Webhook as DiscordWebhook
+from discord.ext.commands import Bot as DiscordBot
 from pytz import timezone
 
 
 class BotClass:
-    def __init__(self, intents: DiscordIntents):
-        self.client = DiscordClient(intents=intents)
+    def __init__(self):
+        intents = DiscordIntents.default()
+        intents.members = True
+        intents.guilds = True
+        intents.messages = True
+
+        self.client = DiscordBot(command_prefix="/", intents=intents)
         self.logger = logging.getLogger("discord")
         self.logger.setLevel(logging.ERROR)
         self.handler = logging.FileHandler(
@@ -27,6 +34,12 @@ class BotClass:
             logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s")
         )
         self.logger.addHandler(self.handler)
+
+        self.CFG: Dict[Any, Any] = {}
+        self.channels: Dict[str, DiscordChannel] = {}
+        self.roles: Dict[str, DiscordRole] = {}
+        self.server_status = "Loading..."
+        self.ready = False
         do_log("Initialized Discord Client")
 
 
@@ -270,7 +283,7 @@ def load_config_to_bot(bot_instance: BotClass) -> BotClass:
         raise FileNotFoundError(f"'{args.config}' not found.")
     for config_key in loaded_config:
         loaded_val = loaded_config[config_key]
-        setattr(bot_instance, config_key, loaded_val)
+        bot_instance.CFG[config_key] = loaded_val
         do_log(
             f"Loaded config setting \n'{config_key}' ({type(loaded_val).__name__})\n{loaded_val} "
         )

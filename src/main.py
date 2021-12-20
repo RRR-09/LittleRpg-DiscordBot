@@ -1,4 +1,5 @@
 import os
+from random import choice as random_choice
 from traceback import format_exc
 
 import discord
@@ -7,9 +8,8 @@ from dotenv import load_dotenv
 import utils
 from utils import BotClass
 
-client_intents = discord.Intents(messages=True, guilds=True, members=True)
 global bot
-bot = BotClass(client_intents)
+bot = BotClass()
 
 
 @bot.client.event
@@ -19,15 +19,14 @@ async def on_error(event, args="", kwargs=""):
 
 
 @bot.client.event
-async def on_message(message):
+async def on_message(message: discord.Message):
     if not bot.ready:  # Handle race condition
         return
 
     # Basic non-overridable shutdown command
-    if (
-        message.author.id == bot.discord_bot_owner_id
-        and message.content.lower().startswith("/off")
-    ):
+    if message.author.id == bot.CFG[
+        "discord_bot_owner_id"
+    ] and message.content.lower().startswith("/off"):
         try:
             await message.delete()
         finally:
@@ -35,11 +34,23 @@ async def on_message(message):
             await bot.client.logout()
             return
 
-    # TODO: message functions
-    message_cleaned = message
-    message_cleaned.content = message_cleaned.content.replace(
-        "@everyone", "@ everyone"
-    ).replace("@here", "@ here")
+    # For safety, strip sensitive pings
+    message.content = message.content.replace("@everyone", "@ everyone")
+    message.content = message.content.replace("@here", "@ here")
+
+    # Process commands
+    await bot.client.process_commands(message)
+
+
+@bot.client.listen("on_member_remove")
+async def log_leaves(member: discord.Member):
+    member_name = f"**{member.display_name}#{member.discriminator}**"
+    message = random_choice(bot.CFG["leave_quips"]).format(user=member_name)  # nosec
+
+    embed = discord.Embed()
+    embed.description = message
+
+    await bot.channels["leaving"].send(embed=embed)
 
 
 async def player_count():
@@ -51,21 +62,19 @@ async def player_count():
 
 
 async def config():
-    bot.guild = bot.client.get_guild(bot.discord_guild_id)
+    bot.guild = bot.client.get_guild(bot.CFG["discord_guild_id"])
 
     # Instantiate channel objects
     bot.channels = {}
-    for channel_name in bot.channel_ids:
-        channel_id = bot.channel_ids[channel_name]
+    for channel_name in bot.CFG["channel_ids"]:
+        channel_id = bot.CFG["channel_ids"][channel_name]
         bot.channels[channel_name] = bot.guild.get_channel(channel_id)
 
     # Instantiate role objects
     bot.roles = {}
-    for role_name in bot.role_ids:
-        role_id = bot.role_ids[role_name]
+    for role_name in bot.CFG["role_ids"]:
+        role_id = bot.CFG["role_ids"][role_name]
         bot.roles[role_name] = bot.guild.get_role(role_id)
-
-    bot.server_status = "Querying server..."
 
 
 @bot.client.event
@@ -74,13 +83,9 @@ async def on_ready():
         utils.do_log(f"Bot name: {bot.client.user.name}")
         utils.do_log(f"Bot ID: {bot.client.user.id}")
         await bot.client.change_presence(
-            activity=discord.Game(name="Starting bot...", type=0)
-        )
-        await config()
-
-        await bot.client.change_presence(
             activity=discord.Game(name=bot.server_status, type=0)
         )
+        await config()
 
         utils.do_log("Ready\n\n")
         bot.ready = True
@@ -91,6 +96,7 @@ async def on_ready():
         await bot.client.close()
         await bot.client.logout()
         raise Exception("CRITICAL ERROR: FAILURE TO INITIALIZE")
+
     await player_count()
 
 
