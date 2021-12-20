@@ -38,7 +38,7 @@ def main_init():
     config_file_name = str(args.config)
     with open(config_file_name, "r", encoding="utf-8") as config_file:
         loaded_config = load_json(config_file)
-    config = loaded_config["watchdog_config"]
+    config = loaded_config["watchdog"]
     config["bot_vars"]["process_name"] = (
         config["bot_vars"]["process_name"].replace(" ", "").lower()
     )
