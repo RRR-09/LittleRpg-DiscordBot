@@ -1,10 +1,30 @@
 {
+    "api_ip_geolocation": "https://api.ipgeolocation.io/timezone?apiKey={api_key}&ip={ip_address}",
+    "api_minecraft_avatar": "https://visage.surgeplay.com/front/{uuid}.png",
+    "api_minecraft_name_to_uuid": "https://api.mojang.com/users/profiles/minecraft/{name}",
+    "bot_command_channel_ids": [
+        123456789012345678
+    ],
+    "censored_minimum_role_bypass": "mod",
+    "censored_words_startswith": [],
+    "censored_words_independent": [],
     "discord_bot_owner_id": 123456789012345678,
     "discord_guild_id": 123456789012345678,
-    "ip_geolocation_api": "https://api.ipgeolocation.io/timezone?apiKey={api_key}&ip={ip_address}",
-    "minecraft_avatar_api": "https://visage.surgeplay.com/front/{uuid}.png",
-    "minecraft_avatar_not_found_url": "https://i.imgur.com/MSg2a9d.jpg",
-    "minecraft_name_to_uuid_api": "https://api.mojang.com/users/profiles/minecraft/{name}",
+    "discord_channel_ids": {
+        "leaving": 123456789012345678,
+        "admin": 123456789012345678,
+        "staff": 123456789012345678,
+        "bot_commands": 123456789012345678
+    },
+    "discord_role_ids": {
+        "admin": 123456789012345678,
+        "mod": 123456789012345678,
+        "vip": 123456789012345678,
+        "helper": 123456789012345678,
+        "premium": 123456789012345678,
+        "player": 123456789012345678,
+        "guest": 123456789012345678
+    },
     "leave_quips": [
         "Aw... {user} has left the server. 💔",
         "{user} has left the server. We'll miss you!",
@@ -14,24 +34,7 @@
         "{user} has left the server! Wait, that's a bad thing.",
         "No, not that button button, {user}-- Dang, they left the server."
     ],
-    "channel_ids": {
-        "leaving": 123456789012345678,
-        "admin": 123456789012345678,
-        "staff": 123456789012345678,
-        "bot_commands": 123456789012345678
-    },
-    "role_ids": {
-        "admin": 123456789012345678,
-        "mod": 123456789012345678,
-        "vip": 123456789012345678,
-        "helper": 123456789012345678,
-        "premium": 123456789012345678,
-        "player": 123456789012345678,
-        "guest": 123456789012345678
-    },
-    "bot_command_channel_ids": [
-        123456789012345678
-    ],
+    "url_minecraft_avatar_not_found": "https://i.imgur.com/MSg2a9d.jpg",
     "watchdog": {
         "bot_vars": {
             "directory": "$HOME/discord_bots/bot_name/src",
