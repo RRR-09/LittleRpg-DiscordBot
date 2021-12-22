@@ -5,6 +5,15 @@
     "minecraft_avatar_api": "https://visage.surgeplay.com/front/{uuid}.png",
     "minecraft_avatar_not_found_url": "https://i.imgur.com/MSg2a9d.jpg",
     "minecraft_name_to_uuid_api": "https://api.mojang.com/users/profiles/minecraft/{name}",
+    "leave_quips": [
+        "Aw... {user} has left the server. 💔",
+        "{user} has left the server. We'll miss you!",
+        "Hopefully they'll be back soon, but {user} has left the server!",
+        "{user} has left the server, hope it wasn't something we said!",
+        "Not sure how to break this news but.... {user} has left the server.",
+        "{user} has left the server! Wait, that's a bad thing.",
+        "No, not that button button, {user}-- Dang, they left the server."
+    ],
     "channel_ids": {
         "leaving": 123456789012345678,
         "admin": 123456789012345678,
