@@ -34,12 +34,12 @@
     ],
     "watchdog": {
         "bot_vars": {
-            "directory": "/home/user/dicord_bot/src",
+            "directory": "$HOME/discord_bots/bot_name/src",
             "launch_command": "poetry run python main.py --config config.json",
             "process_name": "dicord-bot-main"
         },
         "watchdog_vars": {
-            "directory": "/home/user/dicord_bot/src",
+            "directory": "$HOME/discord_bots/bot_name/src",
             "launch_command": "poetry run python watchdog.py --config config.json",
             "process_name": "watchdog_discord-bot"
         }
