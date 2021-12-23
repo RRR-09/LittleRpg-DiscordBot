@@ -1,3 +1,4 @@
+import re
 from typing import List
 
 import discord
@@ -22,6 +23,7 @@ class Censor(commands.Cog):
             bot.CFG["discord_channel_ids"].get(channel_name, -1)
             for channel_name in self.bots_no_warn_channel_names
         ]
+        self.words_regex = re.compile(r"[\W_]+", re.UNICODE)
         self.uncensored_channels: List[int] = []
         self.bot = bot
 
@@ -57,7 +59,7 @@ class Censor(commands.Cog):
 
     async def should_censor_message(self, text):
         censor = False
-        split_message = text.lower().split(" ")
+        split_message = self.words_regex.sub("", text.lower()).split(" ")
         for censored_word in self.words_startswith:
             for word in split_message:
                 if word.startswith(censored_word):
