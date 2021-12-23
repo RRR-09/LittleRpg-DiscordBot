@@ -81,6 +81,7 @@ class Censor(commands.Cog):
                 f"{message.author.mention}, Please don't use bad language 😟\n"
                 "Also, please don't attempt to bypass this chat filter or you will get in trouble."
             )
+
             if message.author.bot:
                 if message.channel.id not in self.bots_no_warn_channel_ids:
                     embed.description = (
@@ -90,7 +91,12 @@ class Censor(commands.Cog):
                     await message.channel.send(embed=embed)
             else:
                 try:
-                    await message.author.send(embed=embed)
+                    message_content = message.content.replace("`", "\\`")
+                    embed_with_message = embed
+                    embed_with_message.description += (
+                        f"\n** **\nYour message: ```{message_content}```"
+                    )
+                    await message.author.send(embed=embed_with_message)
                 except Exception:
                     embed.title = "Bad Language"
                     await message.channel.send(embed=embed)
