@@ -5,16 +5,21 @@
     "bot_command_channel_ids": [
         123456789012345678
     ],
-    "censored_minimum_role_bypass": "mod",
-    "censored_words_startswith": [],
-    "censored_words_independent": [],
+    "censor": {
+        "bots_no_warn_channel_names": [],
+        "highest_censored_role_name": "premium",
+        "words_startswith": [],
+        "words_independent": []
+    },
     "discord_bot_owner_id": 123456789012345678,
     "discord_guild_id": 123456789012345678,
     "discord_channel_ids": {
-        "leaving": 123456789012345678,
         "admin": 123456789012345678,
-        "staff": 123456789012345678,
-        "bot_commands": 123456789012345678
+        "bot_commands": 123456789012345678,
+        "in_game": 123456789012345678,
+        "leaving": 123456789012345678,
+        "server_console": 123456789012345678,
+        "staff": 123456789012345678
     },
     "discord_role_ids": {
         "admin": 123456789012345678,
@@ -32,7 +37,7 @@
         "{user} has left the server, hope it wasn't something we said!",
         "Not sure how to break this news but.... {user} has left the server.",
         "{user} has left the server! Wait, that's a bad thing.",
-        "No, not that button button, {user}-- Dang, they left the server."
+        "No, not that button, {user}-- Dang, they left the server."
     ],
     "url_minecraft_avatar_not_found": "https://i.imgur.com/MSg2a9d.jpg",
     "watchdog": {

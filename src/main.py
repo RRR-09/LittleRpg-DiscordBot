@@ -6,6 +6,7 @@ import discord
 from dotenv import load_dotenv
 
 import utils
+from cogs.censor import Censor as CensorCog
 from utils import BotClass
 
 global bot
@@ -61,19 +62,24 @@ async def player_count():
     )
 
 
+async def post_init():
+    await player_count()
+    bot.client.add_cog(CensorCog(bot))
+
+
 async def config():
     bot.guild = bot.client.get_guild(bot.CFG["discord_guild_id"])
 
     # Instantiate channel objects
     bot.channels = {}
-    for channel_name in bot.CFG["channel_ids"]:
-        channel_id = bot.CFG["channel_ids"][channel_name]
+    for channel_name in bot.CFG["discord_channel_ids"]:
+        channel_id = bot.CFG["discord_channel_ids"][channel_name]
         bot.channels[channel_name] = bot.guild.get_channel(channel_id)
 
     # Instantiate role objects
     bot.roles = {}
-    for role_name in bot.CFG["role_ids"]:
-        role_id = bot.CFG["role_ids"][role_name]
+    for role_name in bot.CFG["discord_role_ids"]:
+        role_id = bot.CFG["discord_role_ids"][role_name]
         bot.roles[role_name] = bot.guild.get_role(role_id)
 
 
@@ -96,8 +102,7 @@ async def on_ready():
         await bot.client.close()
         await bot.client.logout()
         raise Exception("CRITICAL ERROR: FAILURE TO INITIALIZE")
-
-    await player_count()
+    await post_init()
 
 
 def main():

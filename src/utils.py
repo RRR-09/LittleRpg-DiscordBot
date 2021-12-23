@@ -36,6 +36,7 @@ class BotClass:
         self.logger.addHandler(self.handler)
 
         self.CFG: Dict[Any, Any] = {}
+        self.guild: Union[None, DiscordGuild] = None
         self.channels: Dict[str, DiscordChannel] = {}
         self.roles: Dict[str, DiscordRole] = {}
         self.server_status = "Loading..."
