@@ -15,6 +15,7 @@ class Censor(commands.Cog):
         self.words_independent = cfg.get("words_independent", [])
         self.highest_censored_role_name = cfg.get("highest_censored_role_name", "")
         self.bots_no_warn_channel_names = cfg.get("bots_no_warn_channel_names", [])
+        self.letter_replacements = cfg.get("letter_replacements", {})
 
         self.highest_censored_role = bot.roles.get(
             self.highest_censored_role_name, None
@@ -23,7 +24,7 @@ class Censor(commands.Cog):
             bot.CFG["discord_channel_ids"].get(channel_name, -1)
             for channel_name in self.bots_no_warn_channel_names
         ]
-        self.words_regex = re.compile(r"[\W_]+", re.UNICODE)
+        self.words_regex = re.compile(r"[^\sa-zA-Z0-9]+", re.UNICODE)
         self.uncensored_channels: List[int] = []
         self.bot = bot
 
@@ -59,11 +60,21 @@ class Censor(commands.Cog):
 
     async def should_censor_message(self, text):
         censor = False
-        split_message = self.words_regex.sub("", text.lower()).split(" ")
-        for censored_word in self.words_startswith:
-            for word in split_message:
+        text = text.lower()
+        # Replace any attempts at bypassing with different characters
+        for bypass_letter, original_letter in self.letter_replacements.items():
+            text = text.replace(str(bypass_letter), str(original_letter))
+        text = self.words_regex.sub("", text)  # Strip non-alpha-num
+        split_message = text.split(" ")
+
+        for word in split_message:
+            for censored_word in self.words_startswith:
                 if word.startswith(censored_word):
                     censor = True
+                    break
+            if censor:
+                break
+
         # Split by spaces
         if not censor and any(word in split_message for word in self.words_independent):
             censor = True
