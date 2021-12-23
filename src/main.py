@@ -7,10 +7,9 @@ from dotenv import load_dotenv
 
 import utils
 from cogs.censor import Censor as CensorCog
-from utils import BotClass
 
 global bot
-bot = BotClass()
+bot = utils.BotClass()
 
 
 @bot.client.event
