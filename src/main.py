@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 
 import utils
 from cogs.censor import Censor as CensorCog
+from cogs.minimum_role import MinimumRole as MinimumRoleCog
 
 global bot
 bot = utils.BotClass()
@@ -64,6 +65,7 @@ async def player_count():
 async def post_init():
     await player_count()
     bot.client.add_cog(CensorCog(bot))
+    bot.client.add_cog(MinimumRoleCog(bot))
 
 
 async def config():
