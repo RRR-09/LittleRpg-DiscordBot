@@ -40,6 +40,7 @@
         "player": 123456789012345678,
         "guest": 123456789012345678
     },
+    "ingame_chat_channel_name": "in_game",
     "leave_quips": [
         "Aw... {user} has left the server. 💔",
         "{user} has left the server. We'll miss you!",

@@ -322,6 +322,17 @@ dnspython = "2.1.0"
 six = "1.14.0"
 
 [[package]]
+name = "mctools"
+version = "1.1.2"
+description = "Python implementations of common Minecraft protocols."
+category = "main"
+optional = false
+python-versions = ">=3.6, <4"
+
+[package.extras]
+color = ["colorama"]
+
+[[package]]
 name = "multidict"
 version = "5.2.0"
 description = "multidict implementation"
@@ -664,7 +675,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.9,<3.10"
-content-hash = "3622b62f78f6b23c214b5eca65606f7ea52868493ad8fca532c0b34880ecd63c"
+content-hash = "7fd96a42170047045ef62959c1869586009deba91e9e24c91b8bf7079eafbb92"
 
 [metadata.files]
 aiohttp = [
@@ -876,6 +887,9 @@ mcipc = [
 mcstatus = [
     {file = "mcstatus-7.0.0-py3-none-any.whl", hash = "sha256:73daf07252e63444afdbb832584756d37091fcdeeb290cad30e89a45bdbdfa85"},
     {file = "mcstatus-7.0.0.tar.gz", hash = "sha256:553efc05c8c1feb82d99da535b1b034b8beda1551ab1ce522406eb894b8d27be"},
+]
+mctools = [
+    {file = "mctools-1.1.2.tar.gz", hash = "sha256:fd79453c7d0b84dab18b4e406b18ded515a8ce1fef9679eb3eeaba5bae6d7e03"},
 ]
 multidict = [
     {file = "multidict-5.2.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:3822c5894c72e3b35aae9909bef66ec83e44522faf767c0ad39e0e2de11d3b55"},

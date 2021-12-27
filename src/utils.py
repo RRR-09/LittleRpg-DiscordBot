@@ -40,6 +40,7 @@ class BotClass:
         self.channels: Dict[str, DiscordChannel] = {}
         self.roles: Dict[str, DiscordRole] = {}
         self.server_status = "Loading..."
+        self.minecraft_server_online = False
         self.ready = False
         do_log("Initialized Discord Client")
 
