@@ -71,6 +71,13 @@ class MinecraftIntegration(commands.Cog):
         minecraft_name, minecraft_uuid = str(parsed["name"]), str(parsed["uuid"])
         discord_user = message.channel.recipient
         discord_name = f"{discord_user.name}#{discord_user.discriminator}"
+
+        existing = False
+        for user in self.discord_to_minecraft:
+            if minecraft_uuid == user["minecraft_uuid"]:
+                existing = True
+                break
+
         self.discord_to_minecraft[discord_user.id] = {
             "minecraft_name": minecraft_name,
             "minecraft_uuid": minecraft_uuid,
@@ -78,6 +85,21 @@ class MinecraftIntegration(commands.Cog):
         }
         with open(self.data_file_path, "w") as json_file:
             json.dump(self.discord_to_minecraft, json_file, indent=4)
+
+        if not existing:
+            self.rcon_command(f"crazycrate give physical Boost 1 {minecraft_name}")
+            await discord_user.send(
+                "For verifying, you have been given 1 Boost key!\n"
+                "If you do not see it, please run the ``/keys`` command to see if you have a virtual key.\n"
+                "If you did not receive a key, please contact staff."
+            )
+
+        try:
+            discord_member = self.bot.guild.get_member(discord_user.id)
+            await discord_member.add_roles(self.bot.roles["player"])
+            await discord_member.remove_roles(self.bot.roles["guest"])
+        except Exception:
+            await log_error(format_exc())
 
     def init_ingame_chat(self) -> bool:
         self.censor_function = self.bot.client.get_cog("Censor").should_censor_message
@@ -144,10 +166,10 @@ class MinecraftIntegration(commands.Cog):
         embed.description = (
             f"**{message.author.display_name}:** {clean_everyone_content}"
         )
-        if not self.bot.minecraft_server_online:
-            embed.set_footer(text="Server is not online!")
-            await message.channel.send(embed=embed)
-            return
+        # if not self.bot.minecraft_server_online:
+        #     embed.set_footer(text="Server is not online!")
+        #     await message.channel.send(embed=embed)
+        #     return
 
         try:
             failed = False
