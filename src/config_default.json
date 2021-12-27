@@ -20,6 +20,7 @@
         "words_startswith": [],
         "words_independent": []
     },
+    "discordsrv_message": "Your Discord account has been linked to {name} ({uuid})",
     "discord_bot_owner_id": 123456789012345678,
     "discord_guild_id": 123456789012345678,
     "discord_channel_ids": {

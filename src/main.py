@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 
 import utils
 from cogs.censor import Censor as CensorCog
+from cogs.minecraft_integration import MinecraftIntegration as MinecraftIntegrationCog
 from cogs.minimum_role import MinimumRole as MinimumRoleCog
 
 global bot
@@ -66,6 +67,7 @@ async def post_init():
     await player_count()
     bot.client.add_cog(CensorCog(bot))
     bot.client.add_cog(MinimumRoleCog(bot))
+    bot.client.add_cog(MinecraftIntegrationCog(bot))
 
 
 async def config():
