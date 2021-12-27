@@ -5,7 +5,7 @@ from os import getenv
 from pathlib import Path
 from re import sub as re_sub
 from traceback import format_exc
-from typing import Any, Dict, List, Text
+from typing import Any, Dict, List
 
 import discord
 from discord.ext import commands
