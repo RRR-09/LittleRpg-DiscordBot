@@ -73,7 +73,7 @@ class MinecraftIntegration(commands.Cog):
         discord_name = f"{discord_user.name}#{discord_user.discriminator}"
 
         existing = False
-        for user in self.discord_to_minecraft:
+        for user in self.discord_to_minecraft.values():
             if minecraft_uuid == user["minecraft_uuid"]:
                 existing = True
                 break
