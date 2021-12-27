@@ -1,5 +1,6 @@
 # Project files
 src/config.json
+src/data/
 
 # .idea folder
 .idea/
