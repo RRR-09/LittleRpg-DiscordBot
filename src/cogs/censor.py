@@ -13,6 +13,7 @@ class Censor(commands.Cog):
         self.channels_without_censoring = cfg.get("channels_without_censoring", [])
         self.words_startswith = cfg.get("words_startswith", [])
         self.words_independent = cfg.get("words_independent", [])
+        self.words_inside_words = cfg.get("words_inside_words", [])
         self.highest_censored_role_name = cfg.get("highest_censored_role_name", "")
         self.bots_no_warn_channel_names = cfg.get("bots_no_warn_channel_names", [])
         self.letter_replacements = cfg.get("letter_replacements", {})
@@ -72,12 +73,18 @@ class Censor(commands.Cog):
                 if word.startswith(censored_word):
                     censor = True
                     break
+            # Censored words unlikely to be part of other words
+            for whole_censored_word in self.words_inside_words:
+                if whole_censored_word in word:
+                    censor = True
+                    break
             if censor:
                 break
 
         # Split by spaces
         if not censor and any(word in split_message for word in self.words_independent):
             censor = True
+
         return censor
 
     @commands.Cog.listener()
