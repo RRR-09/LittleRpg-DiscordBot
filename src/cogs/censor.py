@@ -90,7 +90,7 @@ class Censor(commands.Cog):
             embed.title = f"Bad Language in #{message.channel.name}"
             embed.description = (
                 f"{message.author.mention}, Please don't use bad language 😟\n"
-                "Also, please don't attempt to bypass this chat filter or you will get in trouble."
+                "Also, please don't attempt to bypass this chat filter."
             )
 
             if message.author.bot:
