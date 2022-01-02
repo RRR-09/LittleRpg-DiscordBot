@@ -8,7 +8,7 @@ from traceback import format_exc
 from typing import Any, Dict, List
 
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 from mctools import RCONClient
 from parse import compile as parser_compile
 from yaml import safe_load as yaml_safe_load
@@ -26,6 +26,7 @@ class MinecraftIntegration(commands.Cog):
                 self.enabled = False
                 print("[Failure in initializing Minecraft integration, disabling.]")
                 return
+        self.nickname_sync.start()
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -36,6 +37,7 @@ class MinecraftIntegration(commands.Cog):
 
     def init_discordsrv(self) -> bool:
         self.discord_to_minecraft = {}
+        self.nickname_sync_skip = self.bot.CFG.get("nickname_sync_skip_discord_ids", [])
 
         data_file_name = "profile_links.json"
         data_folder_path = Path.cwd() / "data"
@@ -358,3 +360,50 @@ class MinecraftIntegration(commands.Cog):
             message_obj.append(tmp_message_object)
 
         return message_obj
+
+    @tasks.loop(seconds=300)
+    async def nickname_sync(self):
+        found = 0
+        needed_change = 0
+        changed = 0
+        for discord_id in self.discord_to_minecraft:
+            profile = self.discord_to_minecraft[discord_id]
+            member = self.bot.guild.get_member(discord_id)
+            if member is None:
+                print(f"[NameSync] User not in discord\n{profile}")
+                continue
+            found += 1
+
+            if discord_id in self.nickname_sync_skip:
+                continue
+
+            final_name = profile["minecraft_name"]
+
+            essentials_profile = await self.get_essentials_profile(
+                profile["minecraft_uuid"]
+            )
+
+            if essentials_profile["success"] is False:
+                log_error(
+                    f"Failure in 'get_essentials_profile' function for nickname_sync\n{profile}"
+                )
+            elif (
+                essentials_profile["data"] and "nickname" in essentials_profile["data"]
+            ):
+                final_name = re_sub(
+                    r"(§[a-zA-Z0-9])", "", essentials_profile["data"]["nickname"]
+                )
+
+            if member.display_name.lower() != final_name.lower():
+                needed_change += 1
+                try:
+                    await member.edit(nick=final_name)
+                    changed += 1
+                except Exception:
+                    error = format_exc()
+                    await log_error(
+                        f"[coroutine_nickname_sync] {member.display_name} / {profile['minecraft_username']}\n{error}"
+                    )
+        print(
+            f"[NameSync] {found}/{len(self.discord_to_minecraft)} found, {changed}/{needed_change} changed"
+        )
