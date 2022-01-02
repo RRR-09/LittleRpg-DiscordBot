@@ -102,12 +102,13 @@ class Censor(commands.Cog):
                     await message.channel.send(embed=embed)
             else:
                 try:
-                    # message_content = message.content.replace("`", "\\`")
-                    # embed_with_message = embed
-                    # embed_with_message.description += (
-                    #     f"\n** **\nYour message: ```{message_content}```"
-                    # )
-                    await message.author.send(embed=embed)
+
+                    embed_with_message = embed.copy()
+                    message_content = message.content.replace("`", "\\`")
+                    embed_with_message.description += (
+                        f"\n** **\nYour message: ```\n{message_content}```"
+                    )
+                    await message.author.send(embed=embed_with_message)
                 except Exception:
                     embed.title = "Bad Language"
                     await message.channel.send(embed=embed)
