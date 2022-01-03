@@ -9,6 +9,7 @@ import utils
 from cogs.censor import Censor as CensorCog
 from cogs.minecraft_integration import MinecraftIntegration as MinecraftIntegrationCog
 from cogs.minimum_role import MinimumRole as MinimumRoleCog
+from cogs.store import Store as StoreCog
 
 global bot
 bot = utils.BotClass()
@@ -68,6 +69,7 @@ async def post_init():
     bot.client.add_cog(CensorCog(bot))
     bot.client.add_cog(MinimumRoleCog(bot))
     bot.client.add_cog(MinecraftIntegrationCog(bot))
+    bot.client.add_cog(StoreCog(bot))
 
 
 async def config():

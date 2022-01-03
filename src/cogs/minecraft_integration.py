@@ -132,7 +132,7 @@ class MinecraftIntegration(commands.Cog):
 
         return True
 
-    def rcon_command(self, cmd="", only_auth=False):
+    def rcon_command(self, cmd=None, cmds=None, only_auth=False):
         rcon = RCONClient(self.rcon_host, port=self.rcon_port)
         try:
             rcon.login(self.rcon_password)
@@ -146,8 +146,16 @@ class MinecraftIntegration(commands.Cog):
                 return False
             return False
         if not only_auth:
-            response = rcon.command(cmd, length_check=False)
-            print(response)
+            commands_to_execute = []
+            if cmds is None and cmd is not None:
+                commands_to_execute.append(cmd)
+            else:
+                commands_to_execute = cmds[:]
+
+            for cmd in commands_to_execute:
+                response = rcon.command(cmd, length_check=False)
+                print(response)
+
             try:
                 rcon.stop()
             except Exception:  # Not sure what exception would happen here
