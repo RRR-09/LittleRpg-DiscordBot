@@ -39,8 +39,6 @@ class BotClass:
         self.guild = DiscordGuild
         self.channels: Dict[str, DiscordChannel] = {}
         self.roles: Dict[str, DiscordRole] = {}
-        self.server_status = "Loading..."
-        self.minecraft_server_online = False
         self.ready = False
         do_log("Initialized Discord Client")
 
@@ -75,7 +73,7 @@ def do_log(message: str):
     print(f"[{get_est_time()}] {message}")
 
 
-async def log_error(error: str):
+def log_error(error: str):
     if "KeyboardInterrupt" in error:
         raise KeyboardInterrupt
     error_message = f"[{get_est_time()}]\n{error}"
@@ -232,9 +230,7 @@ async def is_member_admin(
         member_id = member
         member = guild.get_member(member)
         if member is None:
-            await log_error(
-                f'[{get_est_time()}] ERROR: Could not find member "{member_id}".'
-            )
+            log_error(f'[{get_est_time()}] ERROR: Could not find member "{member_id}".')
             return False
     try:
         if not member.guild_permissions.manage_guild:

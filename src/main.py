@@ -56,16 +56,7 @@ async def log_leaves(member: discord.Member):
     await bot.channels["leaving"].send(embed=embed)
 
 
-async def player_count():
-    # TODO: player count
-    bot.server_status = "0/0 players"
-    await bot.client.change_presence(
-        activity=discord.Game(name=bot.server_status, type=0)
-    )
-
-
 async def post_init():
-    await player_count()
     bot.client.add_cog(CensorCog(bot))
     bot.client.add_cog(MinimumRoleCog(bot))
     bot.client.add_cog(MinecraftIntegrationCog(bot))
@@ -94,12 +85,13 @@ async def on_ready():
         utils.do_log(f"Bot name: {bot.client.user.name}")
         utils.do_log(f"Bot ID: {bot.client.user.id}")
         await bot.client.change_presence(
-            activity=discord.Game(name=bot.server_status, type=0)
+            activity=discord.Game(name="Loading...", type=0)
         )
         await config()
 
         utils.do_log("Ready\n\n")
         bot.ready = True
+        await post_init()
     except Exception:
         await utils.log_error(
             f"\n\n\nCRITICAL ERROR: FAILURE TO INITIALIZE{format_exc()}"
@@ -107,7 +99,6 @@ async def on_ready():
         await bot.client.close()
         await bot.client.logout()
         raise Exception("CRITICAL ERROR: FAILURE TO INITIALIZE")
-    await post_init()
 
 
 def main():

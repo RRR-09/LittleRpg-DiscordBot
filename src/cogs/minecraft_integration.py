@@ -9,24 +9,27 @@ from typing import Any, Dict, List
 
 import discord
 from discord.ext import commands, tasks
-from mctools import RCONClient
+from mctools import PINGClient, RCONClient
 from parse import compile as parser_compile
 from yaml import safe_load as yaml_safe_load
 
-from utils import BotClass, json_load_eval, log_error
+from utils import BotClass, do_log, json_load_eval, log_error
 
 
 class MinecraftIntegration(commands.Cog):
     def __init__(self, bot: BotClass):
         self.bot = bot
-        init_functions = [self.init_discordsrv, self.init_ingame_chat]
+        init_functions = [
+            self.init_discordsrv,
+            self.init_ingame_chat,
+            self.init_server_status,
+        ]
         self.enabled = True
         for function in init_functions:
             if not function():
                 self.enabled = False
                 print("[Failure in initializing Minecraft integration, disabling.]")
                 return
-        self.nickname_sync.start()
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -60,6 +63,8 @@ class MinecraftIntegration(commands.Cog):
             Path(data_folder_path).mkdir(exist_ok=True)
             with open(self.data_file_path, "w") as json_file:
                 json.dump(self.discord_to_minecraft, json_file, indent=4)
+
+        self.nickname_sync.start()
         return True
 
     async def message_discordsrv_dm(self, message: discord.Message):
@@ -101,7 +106,7 @@ class MinecraftIntegration(commands.Cog):
             await discord_member.add_roles(self.bot.roles["player"])
             await discord_member.remove_roles(self.bot.roles["guest"])
         except Exception:
-            await log_error(format_exc())
+            log_error(format_exc())
 
     def init_ingame_chat(self) -> bool:
         self.censor_function = self.bot.client.get_cog("Censor").should_censor_message
@@ -241,7 +246,7 @@ class MinecraftIntegration(commands.Cog):
         except Exception:
             error = format_exc()
             if "mcipc.rcon.errors.NoPlayerFound" not in error:
-                await log_error(f"[Discord-To-Minecraft]\n{error}")
+                log_error(f"[Discord-To-Minecraft]\n{error}")
                 await message.add_reaction("📡")
                 await message.add_reaction("❌")
                 embed.set_footer(text="Failed to send: Unknown error.")
@@ -269,7 +274,7 @@ class MinecraftIntegration(commands.Cog):
                 yml_data_str = "\n".join(yml_data_list)
                 return {"success": True, "data": yaml_safe_load(yml_data_str)}
         except Exception:
-            await log_error("[GetEssentials Error] " + format_exc())
+            log_error("[GetEssentials Error] " + format_exc())
             return {"success": False, "data": {}}
 
     def tellraw_formatter(self, message):
@@ -369,6 +374,34 @@ class MinecraftIntegration(commands.Cog):
 
         return message_obj
 
+    def init_server_status(self) -> bool:
+        self.server_status = "Offline"
+        self.update_server_status.start()
+        return True
+
+    @tasks.loop(seconds=10)
+    async def update_server_status(self):
+        try:
+            ping_func = PINGClient(self.rcon_host, proto_num=25565)
+            stats = ping_func.get_stats()
+            ping_func.stop()
+            players_obj = stats.get("players", {"max": "ERR", "online": "ERR"})
+            status = f"{players_obj['online']}/{players_obj['max']} players"
+        except ConnectionRefusedError:
+            status = "Server Offline"
+        except Exception:
+            status = "ERROR"
+            do_log(f"[update_server_status] ping_func Exception:\n{format_exc()}")
+
+        try:
+            if status != self.server_status:
+                self.server_status = status
+                await self.bot.client.change_presence(
+                    activity=discord.Game(name=self.server_status, type=0)
+                )
+        except Exception:
+            do_log(f"[update_server_status] Discord Exception:\n{format_exc()}")
+
     @tasks.loop(seconds=300)
     async def nickname_sync(self):
         found = 0
@@ -409,7 +442,7 @@ class MinecraftIntegration(commands.Cog):
                     changed += 1
                 except Exception:
                     error = format_exc()
-                    await log_error(
+                    log_error(
                         f"[coroutine_nickname_sync] {member.display_name} / {profile['minecraft_username']}\n{error}"
                     )
         print(
