@@ -93,23 +93,22 @@ class Store(commands.Cog):
                 f"Could not find {user_name}'s discord, but they bought something with a role!"
             )
             return
-
-        if self.bot.guild.get_member(discord_id) is None:
+        user_discord = self.bot.guild.get_member(discord_id)
+        if user_discord is None:
             await self.error_log_channel.send(
                 f"{user_name} isn't in the discord anymore, but they bought something with a role!"
             )
             return
 
-        user_discord: discord.Member = self.bot.guild.get_member(discord_id)
-
         roles_to_add = []
         roles_to_remove = []
         for role in roles:
-            role_name = role.get("name")
-            if role_name not in self.bot.roles:
+            role_name = role.get("name", "role_name_not_found")
+            role_instance = self.bot.roles.get(role_name)
+            if role_instance is None:
                 do_log(f"[Store] Could not find role {role_name}")
                 continue
-            role_instance = self.bot.roles.get(role_name)
+
             if role is None:
                 continue
             if role.get("add", True):
