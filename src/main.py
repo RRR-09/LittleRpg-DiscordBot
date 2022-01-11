@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 
 import utils
 from cogs.censor import Censor as CensorCog
+from cogs.invite_check import InviteCheck as InviteCheckCog
 from cogs.minecraft_integration import MinecraftIntegration as MinecraftIntegrationCog
 from cogs.minimum_role import MinimumRole as MinimumRoleCog
 from cogs.store import Store as StoreCog
@@ -61,6 +62,7 @@ async def post_init():
     bot.client.add_cog(MinimumRoleCog(bot))
     bot.client.add_cog(MinecraftIntegrationCog(bot))
     bot.client.add_cog(StoreCog(bot))
+    bot.client.add_cog(InviteCheckCog(bot))
 
 
 async def config():

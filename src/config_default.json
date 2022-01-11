@@ -19,6 +19,10 @@
     "words_independent": [],
     "words_inside_words": []
   },
+  "custom_invite_messages": {
+    "ABCdefg12h": "custom invite 1"
+  },
+  "custom_invite_format": "{member_name} has joined from {invite_name}",
   "discordsrv_message": "Your Discord account has been linked to {name} ({uuid})",
   "discord_bot_owner_id": 123456789012345678,
   "discord_guild_id": 123456789012345678,
@@ -30,7 +34,8 @@
     "server_console": 123456789012345678,
     "staff": 123456789012345678,
     "store_backend": 123456789012345678,
-    "store_log": 123456789012345678
+    "store_log": 123456789012345678,
+    "welcome": 123456789012345678
   },
   "discord_role_ids": {
     "admin": 123456789012345678,
