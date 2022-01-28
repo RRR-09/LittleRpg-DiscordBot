@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
 from json import load as load_json
 from re import findall
-from subprocess import Popen, check_output  # nosec
+from subprocess import CalledProcessError, Popen, check_output  # nosec
 from time import sleep
 from typing import Dict
 
@@ -16,8 +16,15 @@ def launch(config: Dict):
 
 
 def check(config: Dict) -> bool:
-    screens_list = check_output(["screen", "-list"]).decode().lower()  # nosec
-    running_processes = findall(r"[0-9]*\.(.*?)\t", screens_list)
+    screens_list_output = ""
+    try:
+        process_output = check_output(["screen", "-list"])
+        screens_list_output = process_output.decode().lower()
+    except CalledProcessError as e:
+        exception_output = e.output
+        screens_list_output = exception_output.decode()
+
+    running_processes = findall(r"[0-9]*\.(.*?)\t", screens_list_output.lower())
 
     if config["process_name"] not in running_processes:
         print(f"[{get_est_time()}] {config['process_name']} not running")
