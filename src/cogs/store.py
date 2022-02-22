@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from pathlib import Path
 from time import time
 from traceback import format_exc
@@ -74,6 +75,25 @@ class Store(commands.Cog):
             f"__[{buy_time}]__\n``{user_name}`` bought ``{item_name}``\n{amount}"
         )
         await self.transactions_channel.send(log_message)
+
+        path = Path.cwd() / "data" / "monthly_progress"
+        current_goal_month = f"{datetime.now().strftime('%Y-%m')}.dat"
+        current_income = 0.0
+
+        try:
+            with open(path / current_goal_month, "r") as data_file:
+                current_income = float(data_file.read())
+
+            current_income += transaction_obj.get("gross", 0)
+
+            with open(path / current_goal_month, "w") as data_file:
+                data_file.write(str(current_income))
+
+        except FileNotFoundError:
+            current_income += transaction_obj.get("gross", 0)
+            Path(path).mkdir(exist_ok=True)
+            with open(path / current_goal_month, "w") as data_file:
+                data_file.write(str(current_income))
 
     async def give_ingame_items(self, transaction_obj: Dict):
         command_templates = transaction_obj.get("item", {}).get("commands")
