@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+from os import getenv
 from pathlib import Path
 from time import time
 from traceback import format_exc
@@ -7,6 +8,7 @@ from typing import Any, Dict, List, Union
 
 import discord
 from discord.ext import commands, tasks
+from requests import post
 
 from utils import BotClass, do_log, get_est_time, json_load_eval, log_error
 
@@ -64,6 +66,8 @@ class Store(commands.Cog):
             "MinimumRole"
         ).check_member_has_minimum_role
 
+        self.monthly_progress_path = Path.cwd() / "data" / "monthly_progress"
+
         self.remove_temp_roles.start()
 
     async def log_transaction(self, transaction_obj: Dict):
@@ -76,24 +80,31 @@ class Store(commands.Cog):
         )
         await self.transactions_channel.send(log_message)
 
-        path = Path.cwd() / "data" / "monthly_progress"
         current_goal_month = f"{datetime.now().strftime('%Y-%m')}.dat"
         current_income = 0.0
 
         try:
-            with open(path / current_goal_month, "r") as data_file:
+            with open(
+                self.monthly_progress_path / current_goal_month, "r"
+            ) as data_file:
                 current_income = float(data_file.read())
 
-            current_income += transaction_obj.get("gross", 0)
+            current_income += float(transaction_obj.get("gross", 0))
 
-            with open(path / current_goal_month, "w") as data_file:
+            with open(
+                self.monthly_progress_path / current_goal_month, "w"
+            ) as data_file:
                 data_file.write(str(current_income))
 
         except FileNotFoundError:
             current_income += transaction_obj.get("gross", 0)
-            Path(path).mkdir(exist_ok=True)
-            with open(path / current_goal_month, "w") as data_file:
+            Path(self.monthly_progress_path).mkdir(exist_ok=True)
+            with open(
+                self.monthly_progress_path / current_goal_month, "w"
+            ) as data_file:
                 data_file.write(str(current_income))
+
+        post(getenv("BUILDS_WEBHOOK", ""))
 
     async def give_ingame_items(self, transaction_obj: Dict):
         command_templates = transaction_obj.get("item", {}).get("commands")
@@ -131,11 +142,11 @@ class Store(commands.Cog):
         if roles is None:
             return
 
-        user_name = transaction_obj.get("user_name")
+        user_name = transaction_obj.get("user_name", "")
         user_discord_id = None
         for discord_id, profile in self.discord_to_minecraft.items():
             # Default to different datatype to ensure no false matches (None, "ERROR", "N/A")
-            if profile.get("minecraft_name", -1) == user_name:
+            if profile.get("minecraft_name", -1).lower() == user_name.lower():
                 user_discord_id = discord_id
                 break
         if user_discord_id is None:

@@ -24,12 +24,16 @@ class MinimumRole(commands.Cog):
         self.check_members_have_minimum_role.start()
 
     async def check_member_has_minimum_role(self, member, do_warn=True):
-        if len(member.roles) >= 2:  # Ignore users with 2 roles or more, likely fine
+        has_role = False
+        for role in member.roles:
+            if role.id in self.bot.CFG["discord_role_ids"].values():
+                has_role = True
+                break
+        if has_role:
             return
 
-        if (
-            self.log_channel is not None and do_warn
-        ):  # Log that someone was missing a role
+        if self.log_channel is not None and do_warn:
+            # Log that someone was missing a role
             await self.log_channel.send(
                 f"Warning: {member.mention} missing Guest role. Adding."
             )
@@ -39,6 +43,8 @@ class MinimumRole(commands.Cog):
     @tasks.loop(seconds=30)
     async def check_members_have_minimum_role(self):
         async for member in self.bot.guild.fetch_members(limit=None):
+            if member.bot:
+                continue
             await self.check_member_has_minimum_role(member)
 
     @commands.Cog.listener()

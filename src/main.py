@@ -19,7 +19,7 @@ bot = utils.BotClass()
 @bot.client.event
 async def on_error(event, args="", kwargs=""):
     error = format_exc()
-    await utils.log_error("[Uncaught Error] " + error)
+    utils.log_error("[Uncaught Error] " + error)
 
 
 @bot.client.event
@@ -95,9 +95,7 @@ async def on_ready():
         bot.ready = True
         await post_init()
     except Exception:
-        await utils.log_error(
-            f"\n\n\nCRITICAL ERROR: FAILURE TO INITIALIZE{format_exc()}"
-        )
+        utils.log_error(f"\n\n\nCRITICAL ERROR: FAILURE TO INITIALIZE{format_exc()}")
         await bot.client.close()
         await bot.client.logout()
         raise Exception("CRITICAL ERROR: FAILURE TO INITIALIZE")
