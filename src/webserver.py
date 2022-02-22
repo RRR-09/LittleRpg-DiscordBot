@@ -9,15 +9,8 @@ load_dotenv(verbose=True)
 app = FastAPI()
 
 
-@app.get("/")
-def read_root():
-    return 0
-
-
 @app.get("/donations/{donations_token}")
 def update_item(donations_token: str):
-    print(donations_token)
-    print(getenv("DONATIONS_TOKEN"))
     if donations_token != getenv("DONATIONS_TOKEN"):
         return 0  # TODO: Make a competent security system
 
