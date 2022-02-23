@@ -74,7 +74,7 @@ class Store(commands.Cog):
         buy_time = get_est_time()
         user_name = transaction_obj.get("user_name")
         item_name = transaction_obj.get("item", {}).get("friendly_name")
-        amount = f"${transaction_obj.get('gross')} {transaction_obj.get('currency')}"
+        amount = f"${transaction_obj.get('total')} {transaction_obj.get('currency')}"
         log_message = (
             f"__[{buy_time}]__\n``{user_name}`` bought ``{item_name}``\n{amount}"
         )
@@ -89,7 +89,7 @@ class Store(commands.Cog):
             ) as data_file:
                 current_income = float(data_file.read())
 
-            current_income += float(transaction_obj.get("gross", 0))
+            current_income += float(transaction_obj.get("total", 0))
 
             with open(
                 self.monthly_progress_path / current_goal_month, "w"
@@ -97,7 +97,7 @@ class Store(commands.Cog):
                 data_file.write(str(current_income))
 
         except FileNotFoundError:
-            current_income += transaction_obj.get("gross", 0)
+            current_income += transaction_obj.get("total", 0)
             Path(self.monthly_progress_path).mkdir(exist_ok=True)
             with open(
                 self.monthly_progress_path / current_goal_month, "w"
