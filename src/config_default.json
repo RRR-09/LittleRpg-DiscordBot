@@ -19,6 +19,9 @@
     "words_independent": [],
     "words_inside_words": []
   },
+  "custom_invite_attempts": 3,
+  "custom_invite_channel": "welcome",
+  "custom_invite_debug": true,
   "custom_invite_messages": {
     "ABCdefg12h": "custom invite 1"
   },

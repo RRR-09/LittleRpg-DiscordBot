@@ -23,6 +23,7 @@ class BotClass:
         intents.members = True
         intents.guilds = True
         intents.messages = True
+        intents.invites = True
 
         self.client = DiscordBot(command_prefix="/", intents=intents)
         self.logger = logging.getLogger("discord")
