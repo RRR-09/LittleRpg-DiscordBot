@@ -60,6 +60,7 @@
     "No, not that button, {user}-- Dang, they left the server."
   ],
   "minimum_role_name": "guest",
+  "minimum_alt_role_name": "player",
   "nickname_sync_skip_discord_ids": [],
   "url_minecraft_avatar_not_found": "https://i.imgur.com/MSg2a9d.jpg",
   "watchdog": {
